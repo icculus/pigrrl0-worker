@@ -38,7 +38,7 @@ static void convert_hardcoded_image(const char *name, const HardcodedImage *img)
     }
     printf("\n};\n\n");
 
-    printf("static const uint16_t %s_transparency_data[] = {\n    ", name);
+    printf("static const uint8_t %s_transparency_data[] = {\n    ", name);
     counter = 0;
     for (int i = 0; i < pixel_count; i++) {
         printf("0x%02X", (unsigned int) transparency[i]);
