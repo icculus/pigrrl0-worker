@@ -242,16 +242,16 @@ static void draw_hardcoded_image(const HardcodedImage *img, int x, int y, bool s
     for (int i = 0; i < h; i++) {
         memcpy(cdst, csrc, w * sizeof (uint16_t));
         csrc += imgw;
-        cdst += imgw;
+        cdst += SCREEN_WIDTH;
     }
 
     if (set_transparency) {
         const uint8_t *tsrc = img->transparency;
         uint8_t *tdst = transparency_buffer->buffer + (y * SCREEN_WIDTH) + x;
         for (int i = 0; i < h; i++) {
-            memcpy(tdst, tsrc, w * sizeof (uint16_t));
+            memcpy(tdst, tsrc, w * sizeof (uint8_t));
             tsrc += imgw;
-            tdst += imgw;
+            tdst += SCREEN_WIDTH;
         }
     }
 }
