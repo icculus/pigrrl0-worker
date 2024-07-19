@@ -236,39 +236,22 @@ static void draw_hardcoded_image(const HardcodedImage *img, int x, int y, bool s
 
     //if ((x + w) >= SCREEN_WIDTH) { printf("whoa, x=%d, w=%d, x+w=%d against screenw=%d !\n", x, w, x+w, SCREEN_WIDTH); }
 
-    const uint8_t *src = img->pixel_data;
+    const int imgw = img->width;
+    const uint16_t *csrc = img->rgb565;
     uint16_t *cdst = color_buffer->buffer + (y * SCREEN_WIDTH) + x;
-    const int src_advance = (img->width - w) * 4;
-    const int dst_advance = SCREEN_WIDTH - w;
+    for (int i = 0; i < h; i++) {
+        memcpy(cdst, csrc, w * sizeof (uint16_t));
+        csrc += imgw;
+        cdst += imgw;
+    }
+
     if (set_transparency) {
+        const uint16_t *tsrc = img->transparency;
         uint8_t *tdst = transparency_buffer->buffer + (y * SCREEN_WIDTH) + x;
         for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                // !!! FIXME: convert the hardcoded images to RGB565 plus transparency so we use less space and don't have to convert like this.
-                const uint16_t r = (uint16_t) src[0];
-                const uint16_t g = (uint16_t) src[1];
-                const uint16_t b = (uint16_t) src[2];
-                const uint16_t a = (uint16_t) src[3];
-                *(cdst++) = ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
-                *(tdst++) = a;
-                src += 4;
-            }
-            src += src_advance;
-            cdst += dst_advance;
-            tdst += dst_advance;
-        }
-    } else {
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                // !!! FIXME: convert the hardcoded images to RGB565 plus transparency so we use less space and don't have to convert like this.
-                const uint16_t r = (uint16_t) src[0];
-                const uint16_t g = (uint16_t) src[1];
-                const uint16_t b = (uint16_t) src[2];
-                *(cdst++) = ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
-                src += 4;
-            }
-            src += src_advance;
-            cdst += dst_advance;
+            memcpy(tdst, tsrc, w * sizeof (uint16_t));
+            tsrc += imgw;
+            tdst += imgw;
         }
     }
 }
@@ -402,7 +385,7 @@ static void set_new_volume_animation(const int pct)
     if (volume_animation_state == VOLUME_ANIM_HIDDEN) {
         //printf("SLIDING IN\n");
         volume_animation_state = VOLUME_ANIM_SLIDING_IN;
-        volume_slider_animation_start_ticks = get_ticks();  // !!! FIXME: adjust if we were partially in already.
+        volume_slider_animation_start_ticks = get_ticks();
     } else if (volume_animation_state == VOLUME_ANIM_SHOWN) {
         volume_slider_animation_start_ticks = get_ticks();  // reset the timer so we stay shown as long as adjustments are still being made.
     } else if (volume_animation_state == VOLUME_ANIM_SLIDING_OUT) {

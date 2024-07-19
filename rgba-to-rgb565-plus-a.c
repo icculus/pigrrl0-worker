@@ -28,12 +28,12 @@ static void convert_hardcoded_image(const char *name, const HardcodedImage *img)
         printf("0x%04X", (unsigned int) color[i]);
         if (i < (pixel_count-1)) {
             printf(",");
-        }
-        if (++counter >= 15) {
-            counter = 0;
-            printf("\n    ");
-        } else {
-            printf(" ");
+            if (++counter >= 15) {
+                counter = 0;
+                printf("\n    ");
+            } else {
+                printf(" ");
+            }
         }
     }
     printf("\n};\n\n");
@@ -44,12 +44,12 @@ static void convert_hardcoded_image(const char *name, const HardcodedImage *img)
         printf("0x%02X", (unsigned int) transparency[i]);
         if (i < (pixel_count-1)) {
             printf(",");
-        }
-        if (++counter >= 20) {
-            counter = 0;
-            printf("\n    ");
-        } else {
-            printf(" ");
+            if (++counter >= 20) {
+                counter = 0;
+                printf("\n    ");
+            } else {
+                printf(" ");
+            }
         }
     }
     printf("\n};\n\n");
@@ -71,7 +71,11 @@ int main(void)
            "    unsigned int height;\n"
            "    const uint16_t *rgb565;\n"
            "    const uint8_t *transparency;\n"
-           "} HardcodedImage;\n\n");
+           "} HardcodedImage;\n"
+           "\n"
+           "\n"
+           "// images were edited and converted to C arrays from https://github.com/The-Next-Guy/picotroller (in the assets directory).\n"
+           "\n");
 
     #define IMG(x) convert_hardcoded_image(#x, &x);
     IMG(volume_slider);
@@ -81,7 +85,7 @@ int main(void)
     IMG(volume_full);
     #undef IMG
 
-    printf("\n#endif\n\n");
+    printf("#endif\n\n");
 
     return 0;
 }
