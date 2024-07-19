@@ -433,8 +433,7 @@ static void set_new_volume(int pct)
 
 int main(int argc, char **argv)
 {
-
-    amixerpipe = popen("/usr/bin/amixer -s >/dev/null", "w");
+    amixerpipe = popen("exec /usr/bin/amixer -s >/dev/null", "w");
     if (!amixerpipe) {
         fprintf(stderr, "Failed to pipe to amixer: %s\n", strerror(errno));
         return 1;
