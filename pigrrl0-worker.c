@@ -300,7 +300,7 @@ typedef enum VolumeAnimationState
 static VolumeAnimationState volume_animation_state = VOLUME_ANIM_HIDDEN;  // off by default.
 static int volume_slider_position = SCREEN_WIDTH;
 static uint64_t volume_slider_animation_start_ticks = 0;
-static int volume_slider_pct = 0;
+static int volume_slider_pct = 0;  // this is the volume's current level, not the animation.
 
 #define VOLUME_SLIDER_ANIMATION_TIME 300
 #define VOLUME_SLIDER_SHOWN_TIME 1000
@@ -391,8 +391,15 @@ static void set_new_volume_animation(const int pct)
     } else if (volume_animation_state == VOLUME_ANIM_SLIDING_OUT) {
         //printf("SLIDING BACK IN\n");
         volume_animation_state = VOLUME_ANIM_SLIDING_IN;
-        volume_slider_animation_start_ticks = get_ticks();  // !!! FIXME: adjust if we were partially in already.
-    } /* else if already sliding in, just keep on as you were. */
+        volume_slider_animation_start_ticks = get_ticks();
+
+        // amount we have currently slid in: offset the start_ticks to reflect this.
+        const int total_distance = volume_slider.width;
+        const int distance = volume_slider_position - (SCREEN_WIDTH - total_distance);
+        const float pct = ((float) distance) / ((float) total_distance);
+        const int tick_offset = (int) (VOLUME_SLIDER_ANIMATION_TIME * pct);
+        volume_slider_animation_start_ticks -= tick_offset;
+    } // else if already sliding in, just keep on as you were.
 
     volume_slider_pct = pct;
     sleepms = 12;  // sleep less since dial motion is happening now. Remember that reading the ADC blocks for 8ms, and we want to draw animations, too.
